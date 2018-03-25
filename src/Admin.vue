@@ -1,70 +1,81 @@
 <template>
-	<div class="admin">
-		<el-row class="container">
-			<el-col :span="24" class="header"  v-if="menus">
-				<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
-					{{collapsed?'':sysName}}
+	<div id="admin">
+		<el-container>
+			<el-row class="container">
+				<el-col :span="24" class="header"  v-if="menus">
+					<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
+						{{collapsed?'':sysName}}
+					</el-col>
+					<el-col :span="10">
+						<div class="tools" @click.prevent="collapse">
+							<i class="fa fa-align-justify"></i>
+						</div>
+					</el-col>
+					<el-col :span="4" class="userinfo">
+						<el-dropdown trigger="hover">
+							<span class="el-dropdown-link userinfo-inner">asd
+								<!-- <img :src="user.headimg" /> {{user.username}} -->
+							</span>
+							<el-dropdown-menu slot="dropdown" @command="onDropdownCommand">
+								<el-dropdown-item>我的消息</el-dropdown-item>
+								<el-dropdown-item>设置</el-dropdown-item>
+								<el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
+							</el-dropdown-menu>
+						</el-dropdown>
+					</el-col>
 				</el-col>
-				<el-col :span="10">
-					<div class="tools" @click.prevent="collapse">
-						<i class="fa fa-align-justify"></i>
-					</div>
-				</el-col>
-				<el-col :span="4" class="userinfo">
-					<el-dropdown trigger="hover">
-						<span class="el-dropdown-link userinfo-inner">asd
-							<!-- <img :src="user.headimg" /> {{user.username}} -->
-						</span>
-						<el-dropdown-menu slot="dropdown" @command="onDropdownCommand">
-							<el-dropdown-item>我的消息</el-dropdown-item>
-							<el-dropdown-item>设置</el-dropdown-item>
-							<el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
-						</el-dropdown-menu>
-					</el-dropdown>
-				</el-col>
-			</el-col>
-			<el-col :span="24" class="main">
-				<aside :class="collapsed?'menu-collapsed':'menu-expanded'" v-if="menus">
-					<!-- 导航菜单 -->
-					<el-menu
-					:default-active="$route.path"
-					class="el-menu-vertical-demo"
-					@open="handleopen"
-					@close="handleclose"
-					@select="handleselect"
-					unique-opened router
-					:collapse="collapsed"
-					background-color="#222d32"
-		      text-color="#fff"
-		      active-text-color="#ffd04b"
-					>
-						<el-submenu :index="mm.index"　v-for="mm in menus" :key="mm.index">
-							<template slot="title"><i :class="mm.icon" aria-hidden="true"></i>&nbsp; <span slot="title">{{mm.title}}</span></template>
-							<el-menu-item :index="m.path" :route="m" v-for="m,index in mm.item" :key="index"><span slot="title">{{m.title}}</span></el-menu-item>
-						</el-submenu>
-					</el-menu>
-				</aside>
+				<el-col :span="24" class="main">
+					<aside :class="collapsed?'menu-collapsed':'menu-expanded'" v-if="menus">
+						<!-- 导航菜单 -->
+						<el-menu
+						:default-active="$route.path"
+						class="el-menu-vertical-demo"
+						@open="handleopen"
+						@close="handleclose"
+						@select="handleselect"
+						unique-opened router
+						:collapse="collapsed"
+						background-color="#222d32"
+						text-color="#fff"
+						active-text-color="#ffd04b"
+						>
+							<el-submenu :index="index"　v-for="mm,index in menus" :key="index">
+								<template slot="title"><i :class="mm.icon" aria-hidden="true"></i>&nbsp; <span slot="title">{{mm.title}}</span></template>
+								<el-menu-item :index="m.path" :route="m" v-for="m,i in mm.item" :key="i"><span slot="title">{{m.title}}</span></el-menu-item>
+							</el-submenu>
+						</el-menu>
+					</aside>
 
-				<section class="content-container">
-					<div class="grid-content bg-purple-light">
-						<!-- <el-col :span="24" class="breadcrumb-container" v-if="menus">
-							<strong class="title">{{$route.name}}</strong>
-							<el-breadcrumb separator="/" class="breadcrumb-inner">
-								<el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
-									{{ item.name }}
-								</el-breadcrumb-item>
-							</el-breadcrumb>
-						</el-col> -->
-						<el-col :span="24" class="content-wrapper">
-							<transition name="fade" mode="out-in">
-								<router-view></router-view>
-							</transition>
-						</el-col>
-					</div>
-				</section>
+					<section class="content-container">
+						<div class="grid-content bg-purple-light">
+							<!-- <el-col :span="24" class="breadcrumb-container" v-if="menus">
+								<strong class="title">{{$route.name}}</strong>
+								<el-breadcrumb separator="/" class="breadcrumb-inner">
+									<el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
+										{{ item.name }}
+									</el-breadcrumb-item>
+								</el-breadcrumb>
+							</el-col> -->
+							<el-col :span="24" class="content-wrapper">
+								<transition name="fade" mode="out-in">
+									<router-view></router-view>
+								</transition>
+								<el-footer>
+							    <!-- <div class="pull-right hidden-xs">
+							      <b>Version</b> 2.3.7
+							    </div>
+							    <strong>Copyright © 2014-2016 <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights
+							    reserved. -->
+								</el-footer>
+							</el-col>
+						</div>
+					</section>
 
-			</el-col>
-		</el-row>
+				</el-col>
+			</el-row>
+		</el-container>
+
+
 	</div>
 </template>
 <script>
@@ -76,16 +87,14 @@ var rolemenu = {
       icon: 'fa fa-home fa-lg',
       item: [
         {title: '仪表盘', path: '/'},
-        {title: '栏目管理', path: '/admin/lists'},
       ]
     }, {
       title: '信息管理',
       index: '２',
       icon: 'fa fa-archive fa-lg',
       item: [
-        {title: '导师列表', path: '/admin/teacher'},
-        {title: '文章列表', path: '/admin/article'},
-        {title: '单页列表', path: '/admin/page'},
+        {title: '文章管理', path: '/admin/article'},
+        {title: '单页管理', path: '/admin/page'},
         {title: '附件列表', path: '/admin/attachment'}
       ]
     }, {
@@ -149,6 +158,12 @@ export default {
 }
 </script>
 <style lang="css">
+	.el-footer {
+		background: #fff;
+		padding: 15px;
+		color: #444;
+		border-top: 1px solid #d2d6de;
+	}
 	.container {
 		position: absolute;
 		top: 0px;
