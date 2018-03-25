@@ -1,8 +1,8 @@
 <template>
 	<div id="admin">
-		<el-container>
-			<el-row class="container">
-				<el-col :span="24" class="header"  v-if="menus">
+		<el-container v-if="menus.length>1">
+			<el-row class="container" >
+				<el-col :span="24" class="header">
 					<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
 						{{collapsed?'':sysName}}
 					</el-col>
@@ -13,10 +13,10 @@
 					</el-col>
 					<el-col :span="4" class="userinfo">
 						<el-dropdown trigger="hover">
-							<span class="el-dropdown-link userinfo-inner">asd
+							<span class="el-dropdown-link userinfo-inner">{{user.username}}
 								<!-- <img :src="user.headimg" /> {{user.username}} -->
 							</span>
-							<el-dropdown-menu slot="dropdown" @command="onDropdownCommand">
+							<el-dropdown-menu slot="dropdown">
 								<el-dropdown-item>我的消息</el-dropdown-item>
 								<el-dropdown-item>设置</el-dropdown-item>
 								<el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
@@ -30,16 +30,13 @@
 						<el-menu
 						:default-active="$route.path"
 						class="el-menu-vertical-demo"
-						@open="handleopen"
-						@close="handleclose"
-						@select="handleselect"
 						unique-opened router
 						:collapse="collapsed"
 						background-color="#222d32"
 						text-color="#fff"
 						active-text-color="#ffd04b"
 						>
-							<el-submenu :index="index"　v-for="mm,index in menus" :key="index">
+							<el-submenu :index="mm.index"　v-for="mm,index in menus" :key="index">
 								<template slot="title"><i :class="mm.icon" aria-hidden="true"></i>&nbsp; <span slot="title">{{mm.title}}</span></template>
 								<el-menu-item :index="m.path" :route="m" v-for="m,i in mm.item" :key="i"><span slot="title">{{m.title}}</span></el-menu-item>
 							</el-submenu>
@@ -48,14 +45,6 @@
 
 					<section class="content-container">
 						<div class="grid-content bg-purple-light">
-							<!-- <el-col :span="24" class="breadcrumb-container" v-if="menus">
-								<strong class="title">{{$route.name}}</strong>
-								<el-breadcrumb separator="/" class="breadcrumb-inner">
-									<el-breadcrumb-item v-for="item in $route.matched" :key="item.path">
-										{{ item.name }}
-									</el-breadcrumb-item>
-								</el-breadcrumb>
-							</el-col> -->
 							<el-col :span="24" class="content-wrapper">
 								<transition name="fade" mode="out-in">
 									<router-view></router-view>
@@ -74,8 +63,9 @@
 				</el-col>
 			</el-row>
 		</el-container>
-
-
+		<el-container v-else>
+			<router-view name='login' />
+		</el-container>
 	</div>
 </template>
 <script>
@@ -116,7 +106,7 @@ var rolemenu = {
     },
   ],
 }
-
+import {mapGetters} from 'vuex'
 export default {
   name: 'admin',
   data () {
@@ -124,35 +114,47 @@ export default {
       sysName: '后台管理',
       collapsed: false,
       width: {width: '240px'},
-      menus: rolemenu['admin'],
+      menus: [],
+			user:{},
     }
   },
-	create() {
-		this.menus = rolemenu['admin']
+	beforeMount(){
+		this.$store.dispatch('isLogin');
+	},
+	watch:{
+		userInfo:function() {
+			var user = this.userInfo;
+			if(user.status===0){
+				this.$notify({
+					title: '成功',
+					message: user.info,
+					type: 'success'
+				});
+				this.menus = rolemenu['admin'];
+			}
+			this.user = user.data[0]
+		}
+	},
+	computed:{
+		...mapGetters({
+			userInfo: "getUser"
+		})
 	},
   methods: {
-    handleopen () {
-      console.log('handleopen')
-    },
-    handleclose () {
-      console.log('handleclose')
-    },
-    handleselect: function (a, b) {
-      console.log('menu:', a, b)
-    },
     collapse: function () {
       this.collapsed = !this.collapsed
     },
     showMenu (i, status) {
       this.$refs.menuCollapsed.getElementsByClassName('submenu-hook-' + i)[0].style.display = status ? 'block' : 'none'
     },
-		onDropdownCommand (cmd) {
-			if (cmd === 'logout') {
-				this.$store.dispatch('logout')
-			}
-		},
 		logout: function () {
-			this.$store.dispatch('logout')
+			this.$store.dispatch('logout');
+			this.$notify({
+				title: '成功',
+				message: '退出成功',
+				type: 'success'
+			});
+			this.menus = {};
 		}
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div id="dashboard">
     <el-col :span="24" class="breadcrumb-container">
       <h1><strong class="title">仪表盘</strong></h1>
       <el-breadcrumb separator="/" class="breadcrumb-inner">
